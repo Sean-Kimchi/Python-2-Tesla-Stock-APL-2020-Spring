@@ -1,12 +1,14 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as mp
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import sys
 import os
 
 #***    This program will ingest the tesla stock and coronavirus dataset,
 #***    do some analysis, and ultimately output the data into a dumbbell plot,
-#***    scatter plot, 
+#***    scatter plot,
+
 #modules sometimes warn the user of things they want to do
 #this ignores those warnings
 def hide_warnings():
@@ -26,6 +28,8 @@ def line_sep():
 #read dataset with pandas
 data = pd.read_csv('All_Data.csv')
 
+#converting date collumn to datetime format
+data['Date'] = pd.to_datetime(data['Date']) #or use np.datetime64 in a loop
 #print raw dataset
 def Data_Open():
     print('Full, Raw Dataset')
@@ -37,62 +41,35 @@ Data_Open()
 
 #print dataset of just date and average price
 date_and_price = data[['Date','Average Price', 'year']]
+
 print("Date and price")
 print(date_and_price)
 line_sep()
 
+#Singular parts
+print('Dates')
+dates = date_and_price[['Date']].values
+print(dates)
+line_sep()
 
-def Raw_stock_scatter():
-    
+#Print Years    
+#print('Years')
+years = date_and_price[['year']].values
+print(years)
+line_sep()
 
-    
-    #plot
-    print('Dates')
-    dates = date_and_price[['Date']].values
-    print(dates)
-    line_sep()
-    
-    print('Years')
-    years = date_and_price[['year']].values
-    print(years)
-    line_sep()
+#Print Average Stock Price
+print('Average Stock Price')
+avgprice = date_and_price[['Average Price']].values
+print(avgprice)
+line_sep()
 
-    print('Average Stock Price')
-    avgprice = date_and_price[['Average Price']].values
-    print(avgprice)
-    line_sep()
-
-    print('Different years')
-    all_years = date_and_price['year'].unique()
-    print(all_years)
-    line_sep()
-    line_sep()
-    
-    #list comprehension to aggregate the data
-    plot_list = [[i, avgprice[years==i].mean()] for i in all_years]
-
-    #creating the graph by looping through the data
-    
-
-    fig, ax = mp.subplots(figsize=(12,10))
-    for plot in plot_list:
-        mp.scatter(date_and_price['Date'], date_and_price['Average Price'])
-
-    ax.set(title='Average Tesla Stock 2010-2020')
-    ax.set(xlabel='year-month', ylabel='mean price')
-    mp.ylim(0, 1000)
-    mp.xticks(all_years)
-    ax.get_xscale
-    mp.show()
-    '''mp.savefig('Average_Tesla_Stock_Scatter_Plot.png')'''
-    
-    #close matplotlib - so that the memory is released from the program before close
-    mp.close()
-    
-Raw_stock_scatter()
-   
-
-
+#Print Unique Years
+print('Different years')
+all_years = date_and_price['year'].unique()
+print(all_years)
+line_sep()
+line_sep()
 
 # Start the analysis
 
@@ -115,4 +92,39 @@ T_Volume_stats()
 
 
 
+
+
+
+
+
+
+
+#plot
+
+#create a dataframe of just Date and Price
+df1= pd.DataFrame (date_and_price, columns = ['Date', 'Average Price'])
+print("Date and Price Dataframe")
+line_sep()
+
+#plot with (x,y) of date and average price
+ax = df1.plot(x='Date', y='Average Price')
+
+#make labels
+ax.set(title='Average Tesla Stock 2010-2020')
+ax.set(xlabel='Years', ylabel='Mean Price')
+
+#make intervals for x
+ax.xaxis.set_minor_locator(mdates.MonthLocator(interval = 2))
+
+#set y range
+plt.ylim(0, 1000)
+
+#make grid
+ax.grid(True)
+
+#save graph
+plt.savefig('Average Tesla Stock graph 2010-2020.png')
+plt.show()
+#close matplotlib - so that the memory is released from the program before close
+plt.close()
 
